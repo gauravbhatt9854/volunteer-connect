@@ -7,6 +7,11 @@ type TaskItem = {
     _id: string;
     title: string;
     description: string;
+    postedBy: {
+      name: string;
+      email: string;
+      image?: string;
+    };
   };
   similarityScore: number;
 };
@@ -20,10 +25,8 @@ export default function TasksPage() {
     const fetchTasks = async () => {
       try {
         const res = await fetch("/api/tasks/relevant");
-
         const data = await res.json();
 
-        // 🔥 IMPORTANT CHECK
         if (!Array.isArray(data)) {
           setError(data.message || "Failed to load tasks");
           setTasks([]);
@@ -31,7 +34,7 @@ export default function TasksPage() {
           setTasks(data);
         }
       } catch (err) {
-        setError("Something went wrong");
+        setError("Something went wrong while loading tasks");
         setTasks([]);
       } finally {
         setLoading(false);
@@ -76,14 +79,41 @@ export default function TasksPage() {
             key={item.task._id}
             className="bg-white p-5 rounded-xl shadow hover:shadow-lg transition"
           >
+            {/* Title */}
             <h2 className="font-semibold text-lg">
               {item.task.title}
             </h2>
 
+            {/* Description */}
             <p className="text-gray-600 mt-2 line-clamp-3">
               {item.task.description}
             </p>
 
+            {/* Posted By */}
+            <div className="flex items-center gap-3 mt-4">
+              {item.task.postedBy.image ? (
+                <img
+                  src={item.task.postedBy.image}
+                  alt="profile"
+                  className="w-9 h-9 rounded-full"
+                />
+              ) : (
+                <div className="w-9 h-9 rounded-full bg-gray-300 flex items-center justify-center text-sm font-bold">
+                  {item.task.postedBy.name.charAt(0)}
+                </div>
+              )}
+
+              <div>
+                <p className="text-sm font-medium">
+                  {item.task.postedBy.name}
+                </p>
+                <p className="text-xs text-gray-500">
+                  {item.task.postedBy.email}
+                </p>
+              </div>
+            </div>
+
+            {/* Match Score */}
             <div className="mt-4">
               <span className="inline-block bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm font-medium">
                 Match: {item.similarityScore}%

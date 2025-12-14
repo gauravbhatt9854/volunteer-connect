@@ -8,72 +8,57 @@ import { skillTaskSimilarity } from "@/lib/geminiSimilarity";
 
 export async function GET() {
   try {
-    console.log("🔵 Relevant Tasks API called");
-
     await connectDB();
 
     const session = await getServerSession(authOptions);
     if (!session?.user?.id) {
-      console.log("❌ Unauthorized");
-      return NextResponse.json(
-        { message: "Unauthorized" },
-        { status: 401 }
-      );
+      return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
 
     const user = await User.findById(session.user.id);
     if (!user) {
-      console.log("❌ User not found");
-      return NextResponse.json(
-        { message: "User not found" },
-        { status: 404 }
-      );
+      return NextResponse.json({ message: "User not found" }, { status: 404 });
     }
 
-    const userSkills = Array.isArray(user.skills)
-      ? user.skills
-      : [];
+    const userSkills = Array.isArray(user.skills) ? user.skills : [];
 
-    console.log("🧠 User skills:", userSkills);
+    // ✅ Fetch tasks NOT posted by me + populate poster details
+    const tasks = await Task.find({
+      status: "Open",
+      postedBy: { $ne: session.user.id },
+    })
+      .populate("postedBy", "name email image")
+      .lean();
 
-    const tasks = await Task.find({ status: "Open" });
-    console.log("📋 Tasks found:", tasks.length);
-
-    const result = [];
+    const results = [];
 
     for (const task of tasks) {
+      let similarityScore = 0;
+
       try {
-        const score = await skillTaskSimilarity(
+        similarityScore = await skillTaskSimilarity(
           userSkills,
           task.title,
           task.description
         );
-
-        result.push({
-          task,
-          similarityScore: score,
-        });
-      } catch (aiError) {
-        console.error("⚠️ Gemini error on task:", task._id, aiError);
-
-        result.push({
-          task,
-          similarityScore: 0, // fallback
-        });
+      } catch {
+        similarityScore = 0;
       }
+
+      results.push({
+        task: {
+          ...task,
+          postedBy: task.postedBy, // ✅ name, email, image
+        },
+        similarityScore,
+      });
     }
 
-    result.sort((a, b) => b.similarityScore - a.similarityScore);
+    results.sort((a, b) => b.similarityScore - a.similarityScore);
 
-    console.log("✅ Returning results");
-    return NextResponse.json(result, { status: 200 });
-
+    return NextResponse.json(results, { status: 200 });
   } catch (error) {
-    console.error("🔥 SERVER ERROR:", error);
-
-    return NextResponse.json(
-      { message: "Server error", error: String(error) },
-      { status: 500 }
-    );
+    console.error(error);
+    return NextResponse.json({ message: "Server error" }, { status: 500 });
   }
 }
