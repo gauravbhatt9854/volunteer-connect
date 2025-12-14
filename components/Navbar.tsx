@@ -42,9 +42,9 @@ export default function Navbar() {
           My Volunteering
         </Link>
 
-        <Link href="/notifications" className="hover:text-indigo-600">
+        {/* <Link href="/notifications" className="hover:text-indigo-600">
           Notifications
-        </Link>
+        </Link> */}
         <Link href="/dashboard" className="hover:text-indigo-600">Dashboard</Link>
 
 
