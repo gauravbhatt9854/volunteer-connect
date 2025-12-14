@@ -11,27 +11,47 @@ export default function Navbar() {
 
   return (
     <nav className="w-full bg-white border-b shadow-sm px-6 py-3 flex items-center justify-between">
-      {/* LEFT: Logo / Home */}
+      {/* LEFT: Logo */}
       <Link href="/" className="text-xl font-bold text-indigo-600">
         VolunteerHub
       </Link>
 
-      {/* CENTER: Links */}
+      {/* CENTER: Main Links */}
       <div className="hidden md:flex gap-6 font-medium">
         <Link href="/" className="hover:text-indigo-600">
           Home
         </Link>
 
         <Link href="/tasks" className="hover:text-indigo-600">
-          Tasks
+          Browse Tasks
         </Link>
 
         <Link href="/tasks/add" className="hover:text-indigo-600">
-          Find Help
+          Post a Task
         </Link>
+
         <Link href="/my-tasks" className="hover:text-indigo-600">
           My Tasks
         </Link>
+
+        <Link href="/invites/incoming" className="hover:text-indigo-600">
+          Incoming Requests
+        </Link>
+
+        {/* <Link href="/volunteering" className="hover:text-indigo-600">
+          My Volunteering
+        </Link>
+
+        <Link href="/notifications" className="hover:text-indigo-600">
+          Notifications
+        </Link> */}
+
+        {/* Optional: Admin only */}
+        {session?.user?.role === "Admin" && (
+          <Link href="/admin" className="hover:text-indigo-600">
+            Admin
+          </Link>
+        )}
       </div>
 
       {/* RIGHT: Auth Section */}

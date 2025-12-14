@@ -22,9 +22,10 @@ export async function GET() {
     }
 
     const myTasks = await Task.find({
-      postedBy: session.user.id, // 🔥 FILTER HERE
+      postedBy: session.user.id,
     })
       .populate("postedBy", "name email")
+      .populate("assignedVolunteer", "name email") // ✅ ADD THIS
       .sort({ createdAt: -1 });
 
     return NextResponse.json({ tasks: myTasks }, { status: 200 });

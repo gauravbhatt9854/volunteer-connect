@@ -9,13 +9,17 @@ interface Task {
   title: string;
   description: string;
   category: string;
-  priority: string;
+  priority: "Low" | "Medium" | "High";
   status: string;
   deadline: string;
   postedBy: {
     _id: string;
     name: string;
   };
+  assignedVolunteer?: {
+    _id: string;
+    name: string;
+  } | null;
 }
 
 export default function MyTasksPage() {
@@ -33,16 +37,13 @@ export default function MyTasksPage() {
 
     if (status === "authenticated") {
       fetch("/api/tasks/mine")
-        .then((res) => res.json())
-        .then((data) => {
-          const myTasks = data.tasks.filter(
-            (task: Task) => task.postedBy?._id === session.user.id
-          );
-          setTasks(myTasks);
+        .then(res => res.json())
+        .then(data => {
+          setTasks(data.tasks || []);
         })
         .finally(() => setLoading(false));
     }
-  }, [status, session, router]);
+  }, [status, router]);
 
   if (loading) {
     return <p className="p-6">Loading your tasks...</p>;
@@ -50,23 +51,32 @@ export default function MyTasksPage() {
 
   return (
     <div className="min-h-screen bg-gray-100 p-6">
-      <h1 className="text-2xl font-bold mb-6">📝 My Posted Tasks</h1>
+      <h1 className="text-2xl font-bold mb-6">
+        📝 My Posted Tasks
+      </h1>
 
       {tasks.length === 0 ? (
-        <p className="text-gray-600">You haven’t posted any tasks yet.</p>
+        <p className="text-gray-600">
+          You haven’t posted any tasks yet.
+        </p>
       ) : (
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {tasks.map((task) => (
+          {tasks.map(task => (
             <div
               key={task._id}
-              className="bg-white rounded-xl shadow p-5 space-y-2"
+              className="bg-white rounded-xl shadow p-5 space-y-3"
             >
-              <h2 className="text-lg font-semibold">{task.title}</h2>
+              {/* Title */}
+              <h2 className="text-lg font-semibold">
+                {task.title}
+              </h2>
 
+              {/* Description */}
               <p className="text-sm text-gray-600 line-clamp-3">
                 {task.description}
               </p>
 
+              {/* Tags */}
               <div className="flex flex-wrap gap-2 text-sm">
                 <span className="px-2 py-1 bg-blue-100 rounded">
                   {task.category}
@@ -89,8 +99,17 @@ export default function MyTasksPage() {
                 </span>
               </div>
 
+              {/* Assigned Volunteer */}
+              {task.assignedVolunteer && (
+                <p className="text-sm text-green-700 font-medium">
+                  Assigned to: {task.assignedVolunteer.name}
+                </p>
+              )}
+
+              {/* Deadline */}
               <p className="text-xs text-gray-500">
-                Deadline: {new Date(task.deadline).toLocaleDateString()}
+                Deadline:{" "}
+                {new Date(task.deadline).toLocaleDateString()}
               </p>
             </div>
           ))}
