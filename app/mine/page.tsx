@@ -49,7 +49,7 @@ export default function MyTasksPage() {
     }
   }, [status, router]);
 
-  // ✅ Old behavior still works (no body = Completed)
+  // ✅ Mark completed
   const markCompleted = async (id: string) => {
     if (!confirm("Mark this task as completed?")) return;
 
@@ -61,7 +61,7 @@ export default function MyTasksPage() {
     fetchTasks();
   };
 
-  // 🔁 New feature
+  // 🔁 Unassign volunteer
   const unassignTask = async (id: string) => {
     if (!confirm("Unassign volunteer and reopen task?")) return;
 
@@ -75,6 +75,7 @@ export default function MyTasksPage() {
     fetchTasks();
   };
 
+  // 🗑 Delete task
   const deleteTask = async (id: string) => {
     if (!confirm("Delete this task permanently?")) return;
 
@@ -84,6 +85,33 @@ export default function MyTasksPage() {
     });
 
     fetchTasks();
+  };
+
+  // ✉️ Ask volunteer for progress (ADVANCED EMAIL)
+  const contactVolunteer = (task: Task) => {
+    if (!task.assignedVolunteer) return;
+
+    const subject = encodeURIComponent(
+      `Progress update request: ${task.title}`
+    );
+
+    const body = encodeURIComponent(
+      `Hello ${task.assignedVolunteer.name},\n\n` +
+      `I hope you're doing well.\n\n` +
+      `I wanted to check in regarding the progress of the task "${task.title}". ` +
+      `Please let me know how things are going and if you need any assistance.\n\n` +
+      `Thank you for your efforts!\n`
+    );
+
+    const gmailUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=${task.assignedVolunteer.email}&su=${subject}&body=${body}`;
+
+    const isChrome = navigator.userAgent.includes("Chrome");
+
+    if (isChrome) {
+      window.open(gmailUrl, "_blank");
+    } else {
+      window.location.href = `mailto:${task.assignedVolunteer.email}?subject=${subject}&body=${body}`;
+    }
   };
 
   if (loading) {
@@ -106,17 +134,16 @@ export default function MyTasksPage() {
             <div
               key={task._id}
               className="
-            bg-white/90 backdrop-blur
-            rounded-2xl
-            p-6
-            shadow-md
-            hover:shadow-2xl
-            hover:-translate-y-1
-            transition-all
-            duration-300
-            cursor-pointer
-            space-y-4
-          "
+                bg-white/90 backdrop-blur
+                rounded-2xl
+                p-6
+                shadow-md
+                hover:shadow-2xl
+                hover:-translate-y-1
+                transition-all
+                duration-300
+                space-y-4
+              "
             >
               {/* Title */}
               <h2 className="text-xl font-semibold text-gray-800">
@@ -135,13 +162,12 @@ export default function MyTasksPage() {
                 </span>
 
                 <span
-                  className={`px-3 py-1 rounded-full ${
-                    task.priority === "High"
-                      ? "bg-red-100 text-red-700"
-                      : task.priority === "Medium"
+                  className={`px-3 py-1 rounded-full ${task.priority === "High"
+                    ? "bg-red-100 text-red-700"
+                    : task.priority === "Medium"
                       ? "bg-yellow-100 text-yellow-700"
                       : "bg-green-100 text-green-700"
-                  }`}
+                    }`}
                 >
                   {task.priority}
                 </span>
@@ -155,15 +181,23 @@ export default function MyTasksPage() {
               {task.assignedVolunteer && (
                 <div className="bg-green-50 border border-green-200 rounded-lg p-3 text-sm text-green-800">
                   <p>
-                    <b>Assigned to:</b> {task.assignedVolunteer.name}
+                    <b>Assigned to:</b>{" "}
+                    {task.assignedVolunteer.name}
                   </p>
-                  <p className="text-xs">{task.assignedVolunteer.email}</p>
+                  <p
+                    onClick={() => contactVolunteer(task)}
+                    className="text-xs text-blue-600 hover:underline cursor-pointer"
+                    title="Click to contact volunteer"
+                  >
+                    {task.assignedVolunteer.email}
+                  </p>
                 </div>
               )}
 
               {/* Deadline */}
               <p className="text-xs text-gray-500">
-                ⏰ Deadline: {new Date(task.deadline).toLocaleDateString()}
+                ⏰ Deadline:{" "}
+                {new Date(task.deadline).toLocaleDateString()}
               </p>
 
               {/* ACTION BUTTONS */}
@@ -173,15 +207,9 @@ export default function MyTasksPage() {
                     <button
                       onClick={() => markCompleted(task._id)}
                       className="
-                    flex-1
-                    bg-green-600
-                    text-white
-                    px-3 py-2
-                    rounded-lg
-                    hover:bg-green-700
-                    active:scale-95
-                    transition
-                  "
+                        flex-1 bg-green-600 text-white px-3 py-2
+                        rounded-lg hover:bg-green-700 active:scale-95 transition
+                      "
                     >
                       ✔ Completed
                     </button>
@@ -189,15 +217,9 @@ export default function MyTasksPage() {
                     <button
                       onClick={() => unassignTask(task._id)}
                       className="
-                    flex-1
-                    bg-yellow-500
-                    text-white
-                    px-3 py-2
-                    rounded-lg
-                    hover:bg-yellow-600
-                    active:scale-95
-                    transition
-                  "
+                        flex-1 bg-yellow-500 text-white px-3 py-2
+                        rounded-lg hover:bg-yellow-600 active:scale-95 transition
+                      "
                     >
                       ↩ Unassign
                     </button>
@@ -208,15 +230,9 @@ export default function MyTasksPage() {
                   <button
                     onClick={() => deleteTask(task._id)}
                     className="
-                  flex-1
-                  bg-red-600
-                  text-white
-                  px-3 py-2
-                  rounded-lg
-                  hover:bg-red-700
-                  active:scale-95
-                  transition
-                "
+                      flex-1 bg-red-600 text-white px-3 py-2
+                      rounded-lg hover:bg-red-700 active:scale-95 transition
+                    "
                   >
                     🗑 Delete
                   </button>

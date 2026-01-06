@@ -11,8 +11,8 @@ export default function TaskDetailsPage() {
 
   useEffect(() => {
     fetch(`/api/tasks/${id}`)
-      .then(res => res.json())
-      .then(data => {
+      .then((res) => res.json())
+      .then((data) => {
         setTask(data.task);
         setLoading(false);
       });
@@ -29,19 +29,48 @@ export default function TaskDetailsPage() {
     setMessage(data.message);
   };
 
+  /** ✅ Advanced email handler */
+  const sendEmail = () => {
+    const subject = encodeURIComponent(`Regarding: ${task.title}`);
+    const body = encodeURIComponent(
+      `Hello ${task.postedBy.name},\n\nI am interested in your task "${task.title}".\n\nThanks`
+    );
+
+    const gmailUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=${task.postedBy.email}&su=${subject}&body=${body}`;
+
+    // Prefer Gmail web, fallback to mailto
+    const isChrome = navigator.userAgent.includes("Chrome");
+
+    if (isChrome) {
+      window.open(gmailUrl, "_blank");
+    } else {
+      window.location.href = `mailto:${task.postedBy.email}?subject=${subject}&body=${body}`;
+    }
+  };
+
   if (loading) return <p className="p-6">Loading...</p>;
   if (!task) return <p className="p-6">Task not found</p>;
 
   return (
     <div className="max-w-3xl mx-auto p-6">
+      {/* Title */}
       <h1 className="text-2xl font-bold">{task.title}</h1>
 
+      {/* Description */}
       <p className="text-gray-600 mt-3">{task.description}</p>
 
+      {/* Task Info */}
       <div className="mt-4 space-y-2 text-sm">
-        <p><strong>Category:</strong> {task.category}</p>
-        <p><strong>Priority:</strong> {task.priority}</p>
-        <p><strong>Deadline:</strong> {new Date(task.deadline).toDateString()}</p>
+        <p>
+          <strong>Category:</strong> {task.category}
+        </p>
+        <p>
+          <strong>Priority:</strong> {task.priority}
+        </p>
+        <p>
+          <strong>Deadline:</strong>{" "}
+          {new Date(task.deadline).toDateString()}
+        </p>
       </div>
 
       {/* Posted By */}
@@ -49,10 +78,19 @@ export default function TaskDetailsPage() {
         <img
           src={task.postedBy.image || "/avatar.png"}
           className="w-10 h-10 rounded-full"
+          alt="User avatar"
         />
         <div>
           <p className="font-medium">{task.postedBy.name}</p>
-          <p className="text-xs text-gray-500">{task.postedBy.email}</p>
+
+          {/* Clickable Email */}
+          <p
+            onClick={sendEmail}
+            className="text-xs text-blue-600 hover:underline cursor-pointer"
+            title="Click to send email"
+          >
+            {task.postedBy.email}
+          </p>
         </div>
       </div>
 
@@ -64,10 +102,9 @@ export default function TaskDetailsPage() {
         Send Invite
       </button>
 
+      {/* Success Message */}
       {message && (
-        <p className="mt-3 font-medium text-green-600">
-          {message}
-        </p>
+        <p className="mt-3 font-medium text-green-600">{message}</p>
       )}
     </div>
   );
