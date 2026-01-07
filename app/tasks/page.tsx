@@ -102,7 +102,7 @@ export default function TasksPage() {
             {/* Match Score */}
             <div className="mt-4">
               <span className="inline-block bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm font-medium">
-                Match: {item.similarityScore}%
+                Match: {item.similarityScore * 100}%
               </span>
             </div>
             <button
