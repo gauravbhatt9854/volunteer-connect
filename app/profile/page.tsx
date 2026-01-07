@@ -96,32 +96,53 @@ export default function ProfilePage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 flex justify-center items-start p-6">
-      <div className="bg-white w-full max-w-xl rounded-2xl shadow-lg p-8">
-        <h1 className="text-2xl font-bold mb-6">Edit Profile</h1>
+    <div className="min-h-screen bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-500 flex justify-center items-start p-6">
+      <div className="bg-white/90 backdrop-blur-xl w-full max-w-xl rounded-3xl shadow-2xl overflow-hidden">
 
-        <form onSubmit={handleSubmit} className="space-y-5">
+        {/* Header */}
+        <div className="bg-gradient-to-r from-indigo-600 to-purple-600 p-6 text-white">
+          <div className="flex items-center gap-4">
+            <div className="w-16 h-16 rounded-full bg-white/20 flex items-center justify-center text-2xl font-bold">
+              {form.name ? form.name[0].toUpperCase() : "U"}
+            </div>
+            <div>
+              <h1 className="text-2xl font-bold">Edit Profile</h1>
+              <p className="text-sm text-white/80">
+                Keep your details updated
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Form */}
+        <form onSubmit={handleSubmit} className="p-8 space-y-6">
+
           {/* Name */}
           <div>
-            <label className="block font-medium mb-1">Full Name</label>
+            <label className="block text-sm font-semibold mb-1">
+              Full Name
+            </label>
             <input
               type="text"
               name="name"
               value={form.name}
               onChange={handleChange}
-              className="w-full border rounded-lg px-4 py-2"
+              className="w-full rounded-xl border px-4 py-3 focus:ring-2 focus:ring-indigo-500 outline-none"
+              placeholder="Enter your full name"
               required
             />
           </div>
 
           {/* Role */}
           <div>
-            <label className="block font-medium mb-1">Role</label>
+            <label className="block text-sm font-semibold mb-1">
+              Role
+            </label>
             <select
               name="role"
               value={form.role}
               onChange={handleChange}
-              className="w-full border rounded-lg px-4 py-2"
+              className="w-full rounded-xl border px-4 py-3 focus:ring-2 focus:ring-indigo-500 outline-none"
             >
               <option value="User">User</option>
               <option value="Volunteer">Volunteer</option>
@@ -130,8 +151,8 @@ export default function ProfilePage() {
 
           {/* Skills */}
           <div>
-            <label className="block font-medium mb-1">
-              Skills (comma separated)
+            <label className="block text-sm font-semibold mb-1">
+              Skills
             </label>
             <input
               type="text"
@@ -139,48 +160,68 @@ export default function ProfilePage() {
               value={form.skills}
               onChange={handleChange}
               placeholder="Teaching, First Aid, Coding"
-              className="w-full border rounded-lg px-4 py-2"
+              className="w-full rounded-xl border px-4 py-3 focus:ring-2 focus:ring-indigo-500 outline-none"
             />
+
+            {/* Skill chips preview */}
+            {form.skills && (
+              <div className="flex flex-wrap gap-2 mt-3">
+                {form.skills.split(",").map((skill, i) => (
+                  <span
+                    key={i}
+                    className="px-3 py-1 text-sm bg-indigo-100 text-indigo-700 rounded-full"
+                  >
+                    {skill.trim()}
+                  </span>
+                ))}
+              </div>
+            )}
           </div>
 
-          {/* Location (Auto-filled & Read-only) */}
+          {/* Location */}
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block font-medium mb-1">
-                Latitude (auto)
+              <label className="block text-sm font-semibold mb-1">
+                Latitude
               </label>
               <input
                 type="number"
                 value={form.latitude}
                 readOnly
-                className="w-full border rounded-lg px-4 py-2 bg-gray-100 cursor-not-allowed"
+                className="w-full rounded-xl border px-4 py-3 bg-gray-100 text-gray-600"
               />
             </div>
 
             <div>
-              <label className="block font-medium mb-1">
-                Longitude (auto)
+              <label className="block text-sm font-semibold mb-1">
+                Longitude
               </label>
               <input
                 type="number"
                 value={form.longitude}
                 readOnly
-                className="w-full border rounded-lg px-4 py-2 bg-gray-100 cursor-not-allowed"
+                className="w-full rounded-xl border px-4 py-3 bg-gray-100 text-gray-600"
               />
             </div>
           </div>
 
+          {/* Button */}
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-indigo-600 text-white py-3 rounded-lg hover:bg-indigo-700 transition"
+            className="w-full py-3 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-semibold hover:scale-[1.02] active:scale-[0.98] transition"
           >
             {loading ? "Saving..." : "Save Changes"}
           </button>
 
-          {message && <p className="text-center mt-3">{message}</p>}
+          {message && (
+            <p className="text-center text-sm font-medium mt-2">
+              {message}
+            </p>
+          )}
         </form>
       </div>
     </div>
   );
+
 }
