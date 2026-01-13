@@ -9,7 +9,30 @@ const categories = [
   "Education",
   "Moving",
   "Technology",
+
+  // New categories
+  "Healthcare",
+  "House Cleaning",
+  "Elderly Care",
+  "Child Care",
+  "Transportation",
+  "Event Assistance",
+  "Gardening",
+  "Maintenance & Repair",
+  "Cooking & Meal Prep",
+  "Fitness & Training",
+  "Creative & Design",
+  "Photography & Video",
+  "Content Writing",
+  "Marketing & Social Media",
+  "Legal Assistance",
+  "Financial Help",
+  "Emergency Help",
+  "Volunteering & NGO",
+  "Delivery & Errands",
+  "Personal Assistance",
 ] as const;
+
 
 export default function AddTaskPage() {
   const [form, setForm] = useState({
