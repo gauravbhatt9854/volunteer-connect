@@ -4,12 +4,32 @@ export interface ITask extends Document {
   title: string;
   description: string;
   category:
-    | "Groceries"
-    | "Home Improvement"
-    | "Pet Care"
-    | "Education"
-    | "Moving"
-    | "Technology";
+  | "Groceries"
+  | "Home Improvement"
+  | "Pet Care"
+  | "Education"
+  | "Moving"
+  | "Technology"
+  | "Healthcare"
+  | "House Cleaning"
+  | "Elderly Care"
+  | "Child Care"
+  | "Transportation"
+  | "Event Assistance"
+  | "Gardening"
+  | "Maintenance & Repair"
+  | "Cooking & Meal Prep"
+  | "Fitness & Training"
+  | "Creative & Design"
+  | "Photography & Video"
+  | "Content Writing"
+  | "Marketing & Social Media"
+  | "Legal Assistance"
+  | "Financial Help"
+  | "Emergency Help"
+  | "Volunteering & NGO"
+  | "Delivery & Errands"
+  | "Personal Assistance";
 
   priority: "Low" | "Medium" | "High";
   urgency: boolean;

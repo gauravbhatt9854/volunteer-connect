@@ -9,8 +9,6 @@ const categories = [
   "Education",
   "Moving",
   "Technology",
-
-  // New categories
   "Healthcare",
   "House Cleaning",
   "Elderly Care",
